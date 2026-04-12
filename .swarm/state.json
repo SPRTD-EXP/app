@@ -1,0 +1,41 @@
+{
+  "swarmId": "swarm-mnv5u1sl",
+  "objective": "Initialize the SPRTD Expo mobile app. Create all foundation files: app.json, eas.json, babel.config.js, metro.config.js, package.json with all deps, theme/index.ts, lib/supabase.ts (SecureStore adapter), lib/products.ts (copy types from ../WEBSITE/app/lib/products.ts), lib/api.ts (API_BASE=https://sprtd.co), context/AuthContext.tsx (port from ../WEBSITE/app/context/AuthContext.tsx), context/CartContext.tsx (port from ../WEBSITE/app/context/CartContext.tsx — replace localStorage with AsyncStorage), app/_layout.tsx (GestureHandlerRootView + StripeProvider + AuthProvider + CartProvider + Stack). Full spec: c:/Users/Owner/.claude/plans/mighty-snacking-garden.md. Working directory: c:/Users/Owner/Desktop/SPRTD/APPLICATION/APP/",
+  "strategy": "development",
+  "status": "initialized",
+  "agents": 8,
+  "agentPlan": [
+    {
+      "role": "Coordinator",
+      "type": "coordinator",
+      "count": 1,
+      "purpose": "Orchestrate workflow"
+    },
+    {
+      "role": "Architect",
+      "type": "architect",
+      "count": 1,
+      "purpose": "System design"
+    },
+    {
+      "role": "Coder",
+      "type": "coder",
+      "count": 3,
+      "purpose": "Implementation"
+    },
+    {
+      "role": "Tester",
+      "type": "tester",
+      "count": 2,
+      "purpose": "Quality assurance"
+    },
+    {
+      "role": "Reviewer",
+      "type": "reviewer",
+      "count": 1,
+      "purpose": "Code review"
+    }
+  ],
+  "startedAt": "2026-04-12T02:44:15.384Z",
+  "parallel": true
+}
