@@ -13,7 +13,6 @@ import {
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { supabase } from '../../lib/supabase';
 import { apiGet } from '../../lib/api';
 import { type Product, type Colorway, COLORWAYS, formatPrice } from '../../lib/products';
 import { useCart } from '../../context/CartContext';
@@ -54,19 +53,12 @@ export default function ProductDetailScreen() {
   // Load product
   useEffect(() => {
     if (!slug) return;
-    supabase
-      .from('products')
-      .select('*')
-      .eq('slug', slug)
-      .single()
-      .then(({ data, error }) => {
-        if (error || !data) {
-          setLoading(false);
-          return;
-        }
-        setProduct(data as Product);
+    apiGet<{ product: Product }>('/api/products', { slug })
+      .then(({ product }) => {
+        setProduct(product);
         setLoading(false);
-      });
+      })
+      .catch(() => setLoading(false));
   }, [slug]);
 
   // Reset variations when product changes

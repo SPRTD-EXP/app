@@ -1,17 +1,14 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   Modal,
   StyleSheet,
-  ScrollView,
-  NativeSyntheticEvent,
-  NativeScrollEvent,
   Animated,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { colors, typography, spacing } from '../theme';
+import { colors, spacing } from '../theme';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 
@@ -196,7 +193,7 @@ export default function Navbar({ onLoginPress, onCartPress, scrollY }: NavbarPro
         </View>
       </Animated.View>
 
-      {/* Mobile full-screen overlay menu */}
+      {/* Mobile full-screen overlay menu — 3-zone layout matching website */}
       <Modal
         visible={menuOpen}
         transparent
@@ -205,43 +202,51 @@ export default function Navbar({ onLoginPress, onCartPress, scrollY }: NavbarPro
         statusBarTranslucent
       >
         <View style={styles.overlay}>
-          {/* Close button top right */}
-          <TouchableOpacity
-            style={styles.overlayClose}
-            onPress={() => setMenuOpen(false)}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Text style={styles.overlayCloseText}>×</Text>
-          </TouchableOpacity>
+          {/* Zone 1: Top bar — logo centered, × at right, mirrors navbar height */}
+          <View style={styles.overlayTopBar}>
+            <TouchableOpacity onPress={() => { setMenuOpen(false); handleNavPress('/'); }}>
+              <Text style={styles.overlayLogo}>SPRTD</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.overlayClose}
+              onPress={() => setMenuOpen(false)}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Text style={styles.overlayCloseText}>×</Text>
+            </TouchableOpacity>
+          </View>
 
-          {/* All nav links */}
-          {allLinks.map(link => (
-            <TouchableOpacity
-              key={link.href}
-              onPress={() => handleNavPress(link.href)}
-              style={styles.overlayLinkBtn}
-            >
-              <Text style={styles.overlayLink}>{link.label}</Text>
-            </TouchableOpacity>
-          ))}
+          {/* Zone 2: Nav links — full-width, 64px touch targets */}
+          <View style={styles.overlayLinks}>
+            {allLinks.map(link => (
+              <TouchableOpacity
+                key={link.href}
+                onPress={() => handleNavPress(link.href)}
+                style={styles.overlayLinkBtn}
+              >
+                <Text style={styles.overlayLink}>{link.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
 
-          {/* Auth in overlay */}
-          {!user && (
-            <TouchableOpacity
-              onPress={() => { setMenuOpen(false); onLoginPress(); }}
-              style={styles.overlayLinkBtn}
-            >
-              <Text style={styles.overlayLink}>LOGIN</Text>
-            </TouchableOpacity>
-          )}
-          {user && (
-            <TouchableOpacity
-              onPress={() => handleNavPress('/account')}
-              style={styles.overlayLinkBtn}
-            >
-              <Text style={styles.overlayLink}>ACCOUNT</Text>
-            </TouchableOpacity>
-          )}
+          {/* Zone 3: Login / Account — ghost button at bottom */}
+          <View style={styles.overlayBottom}>
+            {!user ? (
+              <TouchableOpacity
+                onPress={() => { setMenuOpen(false); onLoginPress(); }}
+                style={styles.overlayAuthBtn}
+              >
+                <Text style={styles.overlayAuthText}>LOGIN</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                onPress={() => handleNavPress('/account')}
+                style={styles.overlayAuthBtn}
+              >
+                <Text style={styles.overlayAuthText}>ACCOUNT</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
       </Modal>
     </>
@@ -348,20 +353,34 @@ const styles = StyleSheet.create({
     color: colors.background,
     lineHeight: 10,
   },
-  // Overlay / mobile menu
+  // Overlay / mobile menu — 3-zone layout
   overlay: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  // Zone 1: top bar mirrors navbar
+  overlayTopBar: {
+    height: 56,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.divider,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 32,
+    paddingHorizontal: 20,
+  },
+  overlayLogo: {
+    fontFamily: 'HelveticaNeue-Bold',
+    fontWeight: '700',
+    fontSize: 13,
+    letterSpacing: 4,
+    color: colors.foreground,
+    textTransform: 'uppercase',
   },
   overlayClose: {
     position: 'absolute',
-    top: 20,
     right: 20,
-    width: 40,
-    height: 40,
+    width: 48,
+    height: 48,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -370,16 +389,48 @@ const styles = StyleSheet.create({
     color: colors.foreground,
     lineHeight: 32,
   },
+  // Zone 2: full-width nav links
+  overlayLinks: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   overlayLinkBtn: {
-    paddingVertical: 4,
+    width: '100%',
+    minHeight: 64,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
   },
   overlayLink: {
     fontFamily: 'HelveticaNeue-Bold',
     fontWeight: '700',
     fontSize: 18,
-    letterSpacing: 5.4, // 0.3 * 18
+    letterSpacing: 5.4,
     color: colors.foreground,
     textTransform: 'uppercase',
     textAlign: 'center',
+  },
+  // Zone 3: login/account at bottom
+  overlayBottom: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.divider,
+    paddingHorizontal: 32,
+    paddingVertical: 24,
+  },
+  overlayAuthBtn: {
+    borderWidth: 1,
+    borderColor: 'rgba(245,240,232,0.35)',
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  overlayAuthText: {
+    fontFamily: 'HelveticaNeue-Bold',
+    fontWeight: '700',
+    fontSize: 11,
+    letterSpacing: 3.3,
+    color: colors.foreground,
+    textTransform: 'uppercase',
   },
 });
